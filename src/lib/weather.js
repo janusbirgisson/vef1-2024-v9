@@ -17,7 +17,26 @@ async function sleep(ms) {
  * @returns {Array<Forecast>}
  */
 function parseResponse(data) {
-  return data;
+  if (!data || !data.hourly || !data.hourly.time){
+    return [];
+  }
+
+  const times = data.hourly.time;
+  const temperatures = data.hourly.temperature_2m;
+  const precipitations = data.hourly.precipitation || [];
+
+  const forecasts = times.map((time, index) => {
+    const date = new Date(time);
+    const formattedTime = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false});
+
+    return {
+    time: formattedTime,
+    temperature: temperatures[index],
+    precipitation: precipitations[index] || 0,
+  };
+});
+
+  return forecasts;
 }
 
 /**
